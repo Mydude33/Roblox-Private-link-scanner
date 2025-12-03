@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Roblox Private Server Checker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial; text-align: center; padding: 50px; background: #0e0e10; color: white; }
+    input, button { padding: 15px; margin: 10px; width: 90%; max-width: 500px; font-size: 18px; border-radius: 10px; border: none; }
+    button { background: #00ff9d; cursor: pointer; }
+    #result { margin-top: 30px; font-size: 24px; }
+  </style>
+</head>
+<body>
+  <h1>Roblox Private/VIP Server Checker</h1>
+  <p>Paste any private server link to see how many players are in it</p>
+  
+  <input type="text" id="link" placeholder="https://www.roblox.com/games/.../?privateServerLinkCode=..." />
+  <button onclick="check()">Check Server</button>
+  
+  <div id="result"></div>
+
+  <script>
+    async function check() {
+      const link = document.getElementById('link').value.trim();
+      if (!link) return alert("Paste a link first!");
+
+      const res = await fetch('/api/check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ link })
+      });
+      const data = await res.json();
+
+      const result = document.getElementById('result');
+      if (data.success) {
+        result.innerHTML = `
+          <b>${data.name}</b><br>
+          👥 <b>${data.playing} / ${data.maxPlayers}</b> players online<br>
+          Owner: ${data.owner}
+        `;
+        result.style.color = "#00ff9d";
+      } else {
+        result.innerHTML = "❌ " + data.message;
+        result.style.color = "#ff6b6b";
+      }
+    }
+  </script>
+</body>
+</html>
